@@ -1,4 +1,5 @@
 .venv/
+.venv-msys2-backup/
 .env
 __pycache__/
 *.py[cod]

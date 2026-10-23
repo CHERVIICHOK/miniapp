@@ -25,20 +25,15 @@ PostgreSQL :55432 → products, orders, order_items
 
 ## Быстрый запуск на Windows
 
-Нужны Python 3.12 и доступ в интернет для первой установки. Выполняйте команды в **PowerShell** из папки этого README.
+Нужны **Windows CPython 3.12 x64** и доступ в интернет для первой установки. Выполняйте команды в PowerShell из папки этого README.
 
 ```powershell
-py -3.12 -m venv .venv
+python -m venv .venv
+.\.venv\Scripts\python.exe -c "import sysconfig; print(sysconfig.get_platform())"
 .\.venv\Scripts\python.exe -m pip install -r requirements.lock.txt
 Copy-Item .env.example .env
 .\.venv\Scripts\python.exe -m scripts.local_postgres setup
 .\start.ps1
-```
-
-Если `py` отсутствует, используйте полный путь к Python 3.12, например:
-
-```powershell
-& "$env:LOCALAPPDATA\Programs\Python\Python312\python.exe" -m venv .venv
 ```
 
 Если PowerShell блокирует запуск `.ps1`, можно запускать сервер напрямую:
