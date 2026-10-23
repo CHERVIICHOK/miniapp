@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f6f2e9">
+  <meta name="description" content="Кофе, чай и маленькие радости. Учебный магазин «Тёплое зерно».">
+  <title>Тёплое зерно — магазин маленьких радостей</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='20' fill='%233d5141'/%3E%3Ctext x='12' y='46' font-size='42'%3E☕%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="/static/styles.css">
+  <script src="https://telegram.org/js/telegram-web-app.js" defer></script>
+  <script src="/static/app.js" defer></script>
+</head>
+<body>
+  <div class="site-shell">
+    <header class="header">
+      <a class="brand" href="#catalog" aria-label="Тёплое зерно, главная"><span class="brand-mark" aria-hidden="true">тз<span>✦</span></span><span>тёплое зерно<small>КОФЕ · ЧАЙ · МАЛЕНЬКИЕ РАДОСТИ</small></span></a>
+      <nav class="navigation" aria-label="Главная навигация">
+        <button class="nav-link active" data-view="catalog" aria-current="page">Магазин</button>
+        <button class="nav-link" data-view="orders">Мои заказы</button>
+      </nav>
+      <button id="cart-button" class="cart-button" aria-label="Открыть корзину">Корзина <span id="cart-count">0</span></button>
+    </header>
+
+    <main>
+      <section id="catalog-view">
+        <div class="hero">
+          <div class="hero-copy"><p class="eyebrow"><span></span> ДЛЯ ВАШИХ НЕСПЕШНЫХ МОМЕНТОВ</p><h1>Хороший день<br>начинается<br>с <em>тёплого.</em></h1><p class="hero-description">Ароматный кофе, душистый чай и что-нибудь<br class="desktop-break"> сладкое. Собрали то, что делает день уютнее.</p><a href="#catalog" class="primary-button hero-link">Выбрать своё <span aria-hidden="true">↗</span></a><div class="hero-note"><span aria-hidden="true">✺</span> С заботой о каждом маленьком ритуале</div></div>
+          <div class="hero-art"><img src="/static/images/coffee.png" alt="Ассортимент кофе «Тёплое зерно»" fetchpriority="high"><div class="round-stamp">СОГРЕВАЕТ<br><span>☕</span><br>ИЗНУТРИ</div><div class="image-caption">ВАША ПАУЗА. ВАШ ВКУС.</div></div>
+        </div>
+        <div class="service-strip"><span><b aria-hidden="true">✧</b> Небольшая коллекция, большой вкус</span><span><b aria-hidden="true">⌂</b> Закажите онлайн — заберите сами</span><span><b aria-hidden="true">♡</b> Маленький повод порадовать себя</span></div>
+        <section id="catalog" class="catalog-section" aria-labelledby="catalog-title"><div class="section-heading"><div><p class="eyebrow">ВЫБИРАЙТЕ ПО НАСТРОЕНИЮ</p><h2 id="catalog-title">На вашей полке уюта</h2></div><span class="collection-label">КОЛЛЕКЦИЯ · 12 ВКУСОВ</span></div><div id="categories" class="category-tabs" role="group" aria-label="Категории товаров"></div><div id="catalog-message" role="status" class="message">Загружаем вашу коллекцию…</div><div id="products" class="product-grid"></div></section>
+        <aside class="pickup-note"><span class="pickup-symbol" aria-hidden="true">⌂</span><div><h3>Немного ближе к хорошему дню</h3><p>Выберите любимое, оформите заказ и заберите самостоятельно.<br>Это учебный магазин: оплата и реальная выдача не выполняются.</p></div><span class="pickup-decoration" aria-hidden="true">✳</span></aside>
+      </section>
+
+      <section id="orders-view" class="orders-view" hidden><p class="eyebrow">ВАШИ МАЛЕНЬКИЕ РИТУАЛЫ</p><h1>Мои заказы</h1><p class="page-description">Всё, что вы выбрали для тёплых моментов.</p><button id="refresh-orders" class="text-button">Обновить историю ↻</button><div id="orders-message" role="status" class="message"></div><div id="orders-list" class="orders-list"></div></section>
+    </main>
+    <footer><span class="footer-brand">тёплое зерно<span aria-hidden="true">✦</span></span><p>Больше тепла в обычных днях.</p><small>Учебный проект · ЛР0 <span id="mode-label"></span></small></footer>
+  </div>
+
+  <dialog id="cart-dialog" aria-labelledby="cart-title"><div class="dialog-header"><div><p class="eyebrow">ВАШ ВЫБОР</p><h2 id="cart-title">Корзина</h2></div><button class="icon-button" data-close-dialog="cart-dialog" aria-label="Закрыть корзину">✕</button></div><div id="cart-items"></div><div id="cart-bottom"><div class="cart-total"><span>Итого</span><strong id="cart-total"></strong></div><p class="small-note">Самовывоз · Без онлайн-оплаты</p><form id="checkout-form"><label>Как к вам обращаться<input name="name" autocomplete="name" placeholder="Ваше имя" minlength="2" maxlength="80" required></label><label>Телефон<input name="phone" type="tel" autocomplete="tel" placeholder="+7 999 123-45-67" minlength="10" maxlength="30" required></label><p class="form-note">Учебный заказ — используйте вымышленные контактные данные.</p><p id="checkout-error" class="form-error" role="alert"></p><button id="submit-order" class="primary-button" type="submit">Оформить самовывоз <span aria-hidden="true">→</span></button></form></div></dialog>
+
+  <dialog id="success-dialog" aria-labelledby="success-title"><button class="icon-button success-close" data-close-dialog="success-dialog" aria-label="Закрыть подтверждение">✕</button><div class="success-icon" aria-hidden="true">✓</div><p class="eyebrow">ТЕПЛО УЖЕ БЛИЗКО</p><h2 id="success-title">Заказ принят</h2><p id="success-description"></p><div class="success-note">Это учебный заказ. Оплата не списывается,<br>реальная выдача не предусмотрена.</div><button id="show-orders" class="primary-button">К моим заказам <span aria-hidden="true">→</span></button></dialog>
+  <div id="toast" class="toast" role="status" hidden></div>
+</body>
+</html>
