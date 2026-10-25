@@ -1,0 +1,194 @@
+=== 2026-10-24 17:23:42 : All ===
+
+--- HTTP redirect ---
+curl.exe -I http://shop.test/
+HTTP/1.1 301 Moved Permanently
+Server: nginx/1.31.8
+Date: Sat, 24 Oct 2026 14:23:43 GMT
+Content-Type: text/html
+Content-Length: 169
+Connection: keep-alive
+Location: https://shop.test/
+
+
+--- HTTPS ---
+curl.exe -k -I https://shop.test/
+HTTP/1.1 200 OK
+Server: nginx/1.31.8
+Date: Sat, 24 Oct 2026 14:23:43 GMT
+Content-Type: text/html
+Content-Length: 6859
+Last-Modified: Fri, 23 Oct 2026 15:06:29 GMT
+Connection: keep-alive
+ETag: "6adb77f5-1acb"
+Accept-Ranges: bytes
+
+
+--- Static CSS ---
+curl.exe -k -I https://shop.test/static/styles.css
+HTTP/1.1 200 OK
+Server: nginx/1.31.8
+Date: Sat, 24 Oct 2026 14:23:43 GMT
+Content-Type: text/css
+Content-Length: 13893
+Last-Modified: Fri, 23 Oct 2026 13:50:53 GMT
+Connection: keep-alive
+ETag: "6adb663d-3645"
+Accept-Ranges: bytes
+
+
+--- Alias ---
+curl.exe -k -i https://shop.test/docs/
+HTTP/1.1 200 OK
+Server: nginx/1.31.8
+Date: Sat, 24 Oct 2026 14:23:43 GMT
+Content-Type: text/html
+Content-Length: 118
+Last-Modified: Fri, 23 Oct 2026 16:07:08 GMT
+Connection: keep-alive
+ETag: "6adb862c-76"
+Accept-Ranges: bytes
+
+<!doctype html><html lang="en"><meta charset="utf-8"><title>Lab 1 docs</title><h1>LAB1 DOCS: alias works</h1></html>
+
+--- Admin: expect 401 ---
+curl.exe -k -i https://shop.test/admin
+HTTP/1.1 401 Unauthorized
+Server: nginx/1.31.8
+Date: Sat, 24 Oct 2026 14:23:43 GMT
+Content-Type: text/html
+Content-Length: 179
+Connection: keep-alive
+WWW-Authenticate: Basic realm="Admin"
+
+<html>
+<head><title>401 Authorization Required</title></head>
+<body>
+<center><h1>401 Authorization Required</h1></center>
+<hr><center>nginx/1.31.8</center>
+</body>
+</html>
+
+--- Second site ---
+curl.exe -k -i https://second.test/
+HTTP/1.1 200 OK
+Server: nginx/1.31.8
+Date: Sat, 24 Oct 2026 14:23:44 GMT
+Content-Type: text/html
+Content-Length: 108
+Last-Modified: Fri, 23 Oct 2026 16:11:00 GMT
+Connection: keep-alive
+ETag: "6adb8714-6c"
+Accept-Ranges: bytes
+
+<!doctype html><html lang="en"><meta charset="utf-8"><title>Second site</title><h1>SECOND SITE</h1></html>
+
+--- Second site API: expect 404 ---
+curl.exe -k -i https://second.test/api/products
+HTTP/1.1 404 Not Found
+Server: nginx/1.31.8
+Date: Sat, 24 Oct 2026 14:23:44 GMT
+Content-Type: text/html
+Content-Length: 153
+Connection: keep-alive
+
+<html>
+<head><title>404 Not Found</title></head>
+<body>
+<center><h1>404 Not Found</h1></center>
+<hr><center>nginx/1.31.8</center>
+</body>
+</html>
+
+--- Unknown Host: expect 404 ---
+curl.exe -k -i --resolve unknown.test:443:127.0.0.1 https://unknown.test/
+HTTP/1.1 404 Not Found
+Server: nginx/1.31.8
+Date: Sat, 24 Oct 2026 14:23:44 GMT
+Content-Type: text/html
+Content-Length: 153
+Connection: keep-alive
+
+<html>
+<head><title>404 Not Found</title></head>
+<body>
+<center><h1>404 Not Found</h1></center>
+<hr><center>nginx/1.31.8</center>
+</body>
+</html>
+
+--- Custom 404 ---
+curl.exe -k -i https://shop.test/no-such-page
+HTTP/1.1 404 Not Found
+Server: nginx/1.31.8
+Date: Sat, 24 Oct 2026 14:23:44 GMT
+Content-Type: text/html
+Content-Length: 115
+Connection: keep-alive
+ETag: "6adb8738-73"
+
+<!doctype html><html lang="en"><meta charset="utf-8"><title>Not found</title><h1>LAB1: PAGE NOT FOUND</h1></html>
+
+--- All : GET /api/health ---
+HTTP/1.1 200 OK
+x-backend-id: backend-1
+HTTP/1.1 200 OK
+x-backend-id: backend-2
+HTTP/1.1 200 OK
+x-backend-id: backend-1
+HTTP/1.1 200 OK
+x-backend-id: backend-2
+HTTP/1.1 200 OK
+x-backend-id: backend-1
+HTTP/1.1 200 OK
+x-backend-id: backend-2
+
+--- Rate limit: 40 parallel requests ---
+HTTP 200: 11 responses
+HTTP 429: 29 responses
+
+--- After pause: expect 200 ---
+curl.exe -k -D - -o NUL https://shop.test/api/health
+HTTP/1.1 200 OK
+Server: nginx/1.31.8
+Date: Sat, 24 Oct 2026 14:24:00 GMT
+Content-Type: application/json
+Content-Length: 54
+Connection: keep-alive
+x-backend-id: backend-2
+x-content-type-options: nosniff
+referrer-policy: no-referrer
+cache-control: no-store
+
+
+=== 2026-10-24 17:24:58 : Failover ===
+
+--- Failover : GET /api/health ---
+Backend-1 port 8001 listening (expect False):
+False
+HTTP/1.1 200 OK
+x-backend-id: backend-2
+HTTP/1.1 200 OK
+x-backend-id: backend-2
+HTTP/1.1 200 OK
+x-backend-id: backend-2
+HTTP/1.1 200 OK
+x-backend-id: backend-2
+HTTP/1.1 200 OK
+x-backend-id: backend-2
+HTTP/1.1 200 OK
+x-backend-id: backend-2
+
+--- Catalog after backend-1 stopped ---
+curl.exe -k -D - -o NUL https://shop.test/api/products
+HTTP/1.1 200 OK
+Server: nginx/1.31.8
+Date: Sat, 24 Oct 2026 14:25:15 GMT
+Content-Type: application/json
+Content-Length: 4645
+Connection: keep-alive
+x-backend-id: backend-2
+x-content-type-options: nosniff
+referrer-policy: no-referrer
+cache-control: no-store
+ 
