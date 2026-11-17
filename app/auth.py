@@ -38,6 +38,9 @@ def validate_init_data(raw: str, token: str, max_age: int, now: int | None = Non
 
 def current_user(request: Request) -> str:
     settings: Settings = request.app.state.settings
+    if settings.mode == "compose":
+        # Compose exposes the API only through the private frontend network.
+        return "compose:demo"
     if settings.mode == "telegram":
         user_id = validate_init_data(
             request.headers.get("X-Telegram-Init-Data", ""),

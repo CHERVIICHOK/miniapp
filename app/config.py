@@ -16,8 +16,8 @@ class Settings:
     init_data_max_age: int = 3600
 
     def __post_init__(self):
-        if self.mode not in {"local", "telegram"}:
-            raise ValueError("APP_MODE должен быть local или telegram")
+        if self.mode not in {"local", "telegram", "compose"}:
+            raise ValueError("APP_MODE должен быть local, compose или telegram")
         if self.mode == "telegram" and not self.bot_token:
             raise ValueError("Для APP_MODE=telegram задайте BOT_TOKEN в .env")
         if not self.database_url.startswith(("postgresql://", "postgres://")):
